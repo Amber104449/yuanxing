@@ -1,0 +1,3197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>绿色机场数智化管理平台（二期）- 软件设计原型</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --primary: #00CCFF;
+            --primary-light: rgba(0, 204, 255, 0.1);
+            --primary-dark: #006699;
+            --success: #00FF88;
+            --warning: #FF9900;
+            --danger: #FF3366;
+            --info: #00CCFF;
+            --text-primary: #E0F0FF;
+            --text-secondary: #88B8D8;
+            --text-light: #4A7A9A;
+            --border: rgba(0, 204, 255, 0.2);
+            --bg-page: #0a1628;
+            --bg-card: rgba(13, 33, 55, 0.9);
+            --shadow: 0 2px 12px rgba(0, 204, 255, 0.1);
+            --shadow-hover: 0 4px 20px rgba(0, 204, 255, 0.2);
+            --glow: 0 0 10px rgba(0, 204, 255, 0.5);
+        }
+        body {
+            font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        .login-page {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0066CC 0%, #0099CC 50%, #00CCFF 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .login-box {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 420px;
+            padding: 48px 40px;
+            animation: slideUp 0.5s ease;
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .login-logo img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 16px;
+            border-radius: 50%;
+            background: var(--primary-light);
+            padding: 15px;
+        }
+        .login-logo h1 {
+            font-size: 20px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .login-logo p {
+            font-size: 14px;
+            color: var(--text-light);
+        }
+        .form-group {
+            margin-bottom: 24px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            outline: none;
+        }
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-light);
+        }
+        .login-btn {
+            width: 100%;
+            padding: 16px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 8px;
+        }
+        .login-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,102,204,0.3);
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 13px;
+            color: var(--text-light);
+        }
+        .main-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+        .sidebar {
+            width: 240px;
+            background: linear-gradient(180deg, #0d2137 0%, #0a1628 100%);
+            color: var(--text-primary);
+            flex-shrink: 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            border-right: 1px solid var(--border);
+            transition: width 0.3s ease;
+        }
+        .sidebar.collapsed {
+            width: 60px;
+        }
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .sidebar-header .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .sidebar-header .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-light);
+            border: 1px solid var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            box-shadow: var(--glow);
+        }
+        .sidebar-header .logo-text h2 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+        .sidebar-header .logo-text p {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+        .sidebar.collapsed .logo-text {
+            display: none;
+        }
+        .sidebar.collapsed .sidebar-header {
+            padding: 16px;
+            justify-content: center;
+        }
+        .collapse-btn {
+            width: 32px;
+            height: 32px;
+            background: var(--bg-page);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        .collapse-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .sidebar.collapsed .collapse-btn {
+            transform: rotate(180deg);
+        }
+        .sidebar-menu {
+            padding: 16px 0;
+        }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 14px 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+            font-size: 14px;
+            position: relative;
+        }
+        .menu-item:hover {
+            background: var(--primary-light);
+        }
+        .menu-item.active {
+            background: var(--primary-light);
+            border-left-color: var(--primary);
+            box-shadow: inset 0 0 10px rgba(0, 204, 255, 0.1);
+        }
+        .menu-item .icon {
+            width: 24px;
+            height: 24px;
+            margin-right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            color: var(--primary);
+        }
+        .menu-item .badge {
+            margin-left: auto;
+            background: rgba(0, 204, 255, 0.2);
+            border: 1px solid var(--primary);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--primary);
+        }
+        .sidebar.collapsed .menu-item span,
+        .sidebar.collapsed .menu-item .badge {
+            display: none;
+        }
+        .sidebar.collapsed .menu-item {
+            padding: 14px 18px;
+            justify-content: center;
+        }
+        .sidebar.collapsed .menu-item .icon {
+            margin-right: 0;
+        }
+        .sidebar.collapsed .menu-group-title {
+            display: none;
+        }
+        .sidebar.collapsed .menu-divider {
+            display: none;
+        }
+        .menu-item .tooltip {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            color: var(--text-primary);
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+            z-index: 200;
+            box-shadow: var(--shadow-hover);
+            margin-left: 8px;
+        }
+        .sidebar.collapsed .menu-item:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+        .menu-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 12px 0;
+        }
+        .menu-group-title {
+            padding: 8px 24px;
+            font-size: 11px;
+            opacity: 0.6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .content-area {
+            flex: 1;
+            margin-left: 240px;
+            min-height: 100vh;
+            background: var(--bg-page);
+            transition: margin-left 0.3s ease;
+        }
+        .sidebar.collapsed ~ .content-area {
+            margin-left: 60px;
+        }
+        .top-nav {
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        .top-nav-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+        }
+        .breadcrumb span:last-child {
+            color: var(--primary);
+            font-weight: 500;
+            text-shadow: var(--glow);
+        }
+        .top-nav-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .notification {
+            position: relative;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .notification:hover {
+            background: var(--primary-light);
+            box-shadow: var(--glow);
+        }
+        .notification .dot {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            width: 8px;
+            height: 8px;
+            background: var(--danger);
+            border-radius: 50%;
+            box-shadow: 0 0 10px var(--danger);
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        .user-info:hover {
+            background: var(--primary-light);
+            box-shadow: var(--glow);
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--primary-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+        .user-text {
+            text-align: right;
+        }
+        .user-text .name {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        .user-text .role {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .page-content {
+            padding: 24px;
+        }
+        .page-title {
+            margin-bottom: 24px;
+        }
+        .page-title h1 {
+            font-size: 24px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .page-title p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 24px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), transparent);
+        }
+        .card:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+        }
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .card-header h3 {
+            font-size: 16px;
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+        .card-header .action {
+            color: var(--primary);
+            font-size: 13px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.3s;
+        }
+        .card-header .action:hover {
+            text-shadow: var(--glow);
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary);
+        }
+        .stat-card:hover {
+            box-shadow: var(--shadow-hover);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+        }
+        .stat-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+            border: 1px solid var(--border);
+        }
+        .stat-icon.blue { background: rgba(0, 204, 255, 0.1); color: var(--primary); border-color: var(--primary); }
+        .stat-icon.green { background: rgba(0, 255, 136, 0.1); color: var(--success); border-color: var(--success); }
+        .stat-icon.orange { background: rgba(255, 153, 0, 0.1); color: var(--warning); border-color: var(--warning); }
+        .stat-icon.purple { background: rgba(153, 51, 204, 0.1); color: #9933CC; border-color: #9933CC; }
+        .stat-content .value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .stat-content .label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .stat-content .trend {
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .stat-content .trend.up { color: var(--success); }
+        .stat-content .trend.down { color: var(--danger); }
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+        }
+        .chart-title {
+            font-size: 15px;
+            color: var(--primary);
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            text-shadow: var(--glow);
+        }
+        .chart-container {
+            height: 280px;
+            position: relative;
+        }
+        .mini-chart {
+            height: 150px;
+            position: relative;
+        }
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .data-table th, .data-table td {
+            padding: 12px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .data-table th {
+            background: var(--primary-light);
+            font-weight: 600;
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+        .data-table tbody tr:hover {
+            background: var(--primary-light);
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid transparent;
+        }
+        .badge.success { background: rgba(0, 255, 136, 0.1); color: var(--success); border-color: var(--success); }
+        .badge.warning { background: rgba(255, 153, 0, 0.1); color: var(--warning); border-color: var(--warning); }
+        .badge.danger { background: rgba(255, 51, 102, 0.1); color: var(--danger); border-color: var(--danger); }
+        .badge.info { background: rgba(0, 204, 255, 0.1); color: var(--primary); border-color: var(--primary); }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+        .btn-primary {
+            background: rgba(0, 204, 255, 0.15);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+        .btn-primary:hover {
+            background: rgba(0, 204, 255, 0.25);
+            box-shadow: var(--glow);
+            transform: translateY(-1px);
+        }
+        .btn-secondary {
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            border: 1px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 12px;
+        }
+        .btn-icon {
+            padding: 8px;
+            width: 36px;
+            height: 36px;
+            justify-content: center;
+        }
+        .search-bar {
+            position: relative;
+            flex: 1;
+            max-width: 400px;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 10px 40px 10px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            transition: all 0.3s;
+        }
+        .search-bar input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: var(--glow);
+        }
+        .search-bar .icon {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 0;
+        }
+        .tab {
+            padding: 12px 24px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            margin-bottom: -1px;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            text-shadow: var(--glow);
+        }
+        .tab:hover {
+            color: var(--primary);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group.full {
+            grid-column: span 2;
+        }
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            color: var(--primary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 14px;
+            background: var(--bg-card);
+            color: var(--text-primary);
+            transition: all 0.3s;
+            outline: none;
+            font-family: inherit;
+        }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-light);
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .form-group .hint {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+            box-shadow: var(--shadow-hover);
+        }
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+        .modal-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .modal-header h3 {
+            font-size: 18px;
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            background: var(--bg-card);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            color: var(--text-secondary);
+            transition: all 0.3s;
+        }
+        .modal-close:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .modal-body {
+            padding: 24px;
+        }
+        .modal-footer {
+            padding: 20px 24px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+        .progress-bar {
+            height: 8px;
+            background: var(--bg-page);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+        .progress-bar .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary), var(--success));
+            border-radius: 4px;
+            transition: width 0.5s;
+            box-shadow: var(--glow);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-light);
+        }
+        .empty-state .icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+        .empty-state h3 {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+        .empty-state p {
+            font-size: 14px;
+        }
+        .dashboard-container {
+            position: relative;
+            width: 100%;
+            height: calc(100vh - 60px);
+            overflow: hidden;
+        }
+        .globe-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+        .dashboard-overlay {
+            position: relative;
+            z-index: 10;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            pointer-events: none;
+        }
+        .dashboard-overlay > * {
+            pointer-events: auto;
+        }
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: linear-gradient(180deg, rgba(10, 22, 40, 0.95) 0%, transparent 100%);
+        }
+        .header-title h1 {
+            font-size: 28px;
+            color: var(--primary);
+            text-shadow: 0 0 20px rgba(0, 204, 255, 0.5);
+            margin-bottom: 4px;
+        }
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .kpi-row {
+            display: flex;
+            gap: 16px;
+            padding: 0 24px;
+            margin-bottom: 16px;
+        }
+        .kpi-card {
+            flex: 1;
+            background: rgba(13, 33, 55, 0.85);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--primary);
+        }
+        .kpi-card:hover {
+            background: rgba(0, 204, 255, 0.15);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 204, 255, 0.2);
+        }
+        .kpi-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--primary-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            border: 1px solid var(--border);
+        }
+        .kpi-content {
+            flex: 1;
+        }
+        .kpi-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .kpi-trend {
+            font-size: 12px;
+            font-weight: 500;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+        .kpi-trend.up {
+            color: var(--success);
+            background: rgba(0, 255, 136, 0.1);
+        }
+        .kpi-trend.down {
+            color: var(--danger);
+            background: rgba(255, 51, 102, 0.1);
+        }
+        .dashboard-body {
+            flex: 1;
+            display: flex;
+            gap: 16px;
+            padding: 0 24px 24px;
+            overflow: hidden;
+        }
+        .left-panel, .right-panel {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+        }
+        .center-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+        }
+        .panel-card {
+            background: rgba(13, 33, 55, 0.9);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+        }
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .panel-header h3 {
+            font-size: 14px;
+            color: var(--primary);
+            text-shadow: var(--glow);
+        }
+        .panel-select {
+            background: var(--bg-page);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .panel-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .trend-value {
+            color: var(--success);
+            font-weight: 600;
+        }
+        .star-distribution {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .star-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .star-bar {
+            flex: 1;
+            height: 8px;
+            border-radius: 4px;
+        }
+        .star-bar.three-star {
+            background: linear-gradient(90deg, #00FF88, rgba(0, 255, 136, 0.3));
+            width: 30%;
+        }
+        .star-bar.two-star {
+            background: linear-gradient(90deg, #FF9900, rgba(255, 153, 0, 0.3));
+            width: 55%;
+        }
+        .star-bar.one-star {
+            background: linear-gradient(90deg, #00CCFF, rgba(0, 204, 255, 0.3));
+            width: 88%;
+        }
+        .star-count {
+            font-size: 12px;
+            color: var(--text-primary);
+            font-weight: 600;
+            min-width: 20px;
+        }
+        .warning-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .warning-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: var(--bg-page);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .warning-item:hover {
+            background: var(--primary-light);
+        }
+        .warning-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .warning-dot.danger {
+            background: var(--danger);
+            box-shadow: 0 0 8px var(--danger);
+        }
+        .warning-dot.warning {
+            background: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+        .warning-dot.info {
+            background: var(--primary);
+            box-shadow: 0 0 8px var(--primary);
+        }
+        .warning-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+        .globe-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(13, 33, 55, 0.8);
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .globe-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-page);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .globe-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .legend {
+            background: rgba(13, 33, 55, 0.8);
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+        .legend-item:last-child {
+            margin-bottom: 0;
+        }
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .legend-dot.three-star {
+            background: #00FF88;
+            box-shadow: 0 0 10px #00FF88;
+        }
+        .legend-dot.two-star {
+            background: #FF9900;
+            box-shadow: 0 0 10px #FF9900;
+        }
+        .legend-dot.one-star {
+            background: #00CCFF;
+            box-shadow: 0 0 10px #00CCFF;
+        }
+        .close-btn {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .close-btn:hover {
+            color: var(--primary);
+        }
+        .airport-detail-content {
+            text-align: center;
+            padding: 20px 0;
+        }
+        .detail-icon {
+            font-size: 48px;
+            margin-bottom: 12px;
+            opacity: 0.5;
+        }
+        .detail-name {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .detail-hint {
+            font-size: 12px;
+            color: var(--text-light);
+        }
+        .policy-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .policy-item {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            padding: 12px;
+            background: var(--bg-page);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .policy-item:hover {
+            background: var(--primary-light);
+        }
+        .policy-tag {
+            font-size: 10px;
+            color: var(--primary);
+            background: var(--primary-light);
+            padding: 2px 6px;
+            border-radius: 4px;
+            align-self: flex-start;
+        }
+        .policy-title {
+            font-size: 13px;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .policy-date {
+            font-size: 11px;
+            color: var(--text-light);
+        }
+        .quick-links {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .quick-link-btn {
+            padding: 12px;
+            background: var(--bg-page);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .quick-link-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--border);
+        }
+        .timeline-item {
+            position: relative;
+            padding: 16px 20px;
+            background: var(--bg-page);
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -28px;
+            top: 20px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 3px solid white;
+        }
+        .timeline-item .time {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-bottom: 4px;
+        }
+        .timeline-item .title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        .timeline-item .desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+        .radar-chart {
+            height: 250px;
+            position: relative;
+        }
+        .pie-chart {
+            height: 200px;
+            position: relative;
+        }
+        .map-container {
+            height: 300px;
+            background: var(--bg-page);
+            border-radius: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .map-placeholder {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: var(--text-light);
+            font-size: 14px;
+        }
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                transform: translateX(-100%);
+                transition: transform 0.3s;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .content-area {
+                margin-left: 0;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group.full {
+                grid-column: span 1;
+            }
+        }
+        .dark-container {
+            background: linear-gradient(145deg, #0a1628 0%, #0d2137 50%, #0a1628 100%);
+            border: 1px solid rgba(0, 204, 255, 0.3);
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 
+                0 0 20px rgba(0, 204, 255, 0.1),
+                inset 0 0 60px rgba(0, 204, 255, 0.03);
+            position: relative;
+            overflow: hidden;
+        }
+        .dark-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: 
+                linear-gradient(rgba(0, 204, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 204, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+        .dark-container::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at center, rgba(0, 204, 255, 0.05) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .dark-title {
+            color: #00CCFF;
+            font-size: 18px;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.5);
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        .glow-text {
+            color: #00CCFF;
+            text-shadow: 0 0 10px rgba(0, 204, 255, 0.8), 0 0 20px rgba(0, 204, 255, 0.4);
+        }
+        .glow-border {
+            border: 1px solid rgba(0, 204, 255, 0.5);
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.3), inset 0 0 10px rgba(0, 204, 255, 0.1);
+        }
+        .cyber-grid {
+            background-image: 
+                linear-gradient(rgba(0, 204, 255, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 204, 255, 0.1) 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+        .chart-dark-bg {
+            background: rgba(0, 20, 40, 0.6);
+            border: 1px solid rgba(0, 204, 255, 0.2);
+            border-radius: 8px;
+        }
+        .three-container {
+            width: 100%;
+            height: 400px;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .globe-info {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            color: #00CCFF;
+            font-size: 12px;
+            z-index: 10;
+            text-shadow: 0 0 5px rgba(0, 204, 255, 0.8);
+        }
+        .airport-marker {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: #00FF88;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #00FF88, 0 0 20px #00FF88;
+            animation: pulse 2s infinite;
+            cursor: pointer;
+            z-index: 5;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.5); opacity: 0.7; }
+        }
+        .airport-tooltip {
+            position: absolute;
+            background: rgba(0, 20, 40, 0.95);
+            border: 1px solid rgba(0, 204, 255, 0.5);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: #00CCFF;
+            font-size: 12px;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 100;
+            box-shadow: 0 0 10px rgba(0, 204, 255, 0.3);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .airport-marker:hover + .airport-tooltip {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div class="login-page" id="loginPage">
+            <div class="login-box">
+                <div class="login-logo">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIzMCIgY3k9IjMwIiByPSIyOCIvPjxwYXRoIGQ9Ik0zNiAxOGMtNC40MTggMC04IDMuNTgyLTggOHM3LjU4MiA4IDggOCA4LTcuNTgyIDgtOC03LjU4Mi04LTgtOHptMCAxMmMtMi4yMSAwLTQtMS43OS00LTRzMS43OS00IDQtNCA0IDEuNzkgNCA0LTEuNzkgNC00IDR6Ii8+PC9zdmc+" alt="Logo">
+                    <h1>绿色机场数智化管理平台</h1>
+                    <p>双碳机场评价与数据服务平台</p>
+                </div>
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" placeholder="请输入用户名" id="username">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" placeholder="请输入密码" id="password">
+                </div>
+                <button class="login-btn" onclick="login()">登 录</button>
+                <div class="login-footer">
+                    <p>中国民用机场协会 · 绿色机场数智化管理平台（二期）</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="main-layout" id="mainLayout" style="display: none;">
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <div class="logo-icon">✈</div>
+                        <div class="logo-text">
+                            <h2>绿色机场平台</h2>
+                            <p>二期管理后台</p>
+                        </div>
+                    </div>
+                    <button class="collapse-btn" onclick="toggleSidebar()">›</button>
+                </div>
+                <nav class="sidebar-menu">
+                    <div class="menu-group-title">数据模块</div>
+                    <div class="menu-item" onclick="navigate('dashboard')">
+                        <div class="icon">📊</div>
+                        <span>数据总览</span>
+                        <span class="badge">6</span>
+                        <span class="tooltip">数据总览</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('analysis')">
+                        <div class="icon">📈</div>
+                        <span>数据分析与对标</span>
+                        <span class="tooltip">数据分析与对标</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('warning')">
+                        <div class="icon">⚠️</div>
+                        <span>智能预警</span>
+                        <span class="badge">3</span>
+                        <span class="tooltip">智能预警</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('reports')">
+                        <div class="icon">📄</div>
+                        <span>报告管理</span>
+                        <span class="tooltip">报告管理</span>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-group-title">资源库模块</div>
+                    <div class="menu-item" onclick="navigate('cases')">
+                        <div class="icon">📚</div>
+                        <span>典型案例库</span>
+                        <span class="tooltip">典型案例库</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('tech')">
+                        <div class="icon">🔬</div>
+                        <span>新技术推广</span>
+                        <span class="tooltip">新技术推广</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('standards')">
+                        <div class="icon">📋</div>
+                        <span>标准制度库</span>
+                        <span class="tooltip">标准制度库</span>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-group-title">评价与合规</div>
+                    <div class="menu-item" onclick="navigate('preScore')">
+                        <div class="icon">📝</div>
+                        <span>评星预打分</span>
+                        <span class="tooltip">评星预打分</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('compliance')">
+                        <div class="icon">✅</div>
+                        <span>政策合规预审</span>
+                        <span class="tooltip">政策合规预审</span>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-group-title">碳资产模块</div>
+                    <div class="menu-item" onclick="navigate('carbon')">
+                        <div class="icon">🌱</div>
+                        <span>碳资产管理</span>
+                        <span class="tooltip">碳资产管理</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('esg')">
+                        <div class="icon">📊</div>
+                        <span>ESG报告管理</span>
+                        <span class="tooltip">ESG报告管理</span>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-group-title">协会业务</div>
+                    <div class="menu-item" onclick="navigate('personalize')">
+                        <div class="icon">🎯</div>
+                        <span>个性化提升包</span>
+                        <span class="tooltip">个性化提升包</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('procurement')">
+                        <div class="icon">🛒</div>
+                        <span>集采联盟</span>
+                        <span class="tooltip">集采联盟</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('contribution')">
+                        <div class="icon">🏆</div>
+                        <span>贡献度评价</span>
+                        <span class="tooltip">贡献度评价</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('industry')">
+                        <div class="icon">🌍</div>
+                        <span>行业典型数据</span>
+                        <span class="tooltip">行业典型数据</span>
+                    </div>
+                    <div class="menu-divider"></div>
+                    <div class="menu-group-title">系统管理</div>
+                    <div class="menu-item" onclick="navigate('users')">
+                        <div class="icon">👥</div>
+                        <span>用户管理</span>
+                        <span class="tooltip">用户管理</span>
+                    </div>
+                    <div class="menu-item" onclick="navigate('settings')">
+                        <div class="icon">⚙️</div>
+                        <span>系统设置</span>
+                        <span class="tooltip">系统设置</span>
+                    </div>
+                </nav>
+            </aside>
+
+            <main class="content-area">
+                <header class="top-nav">
+                    <div class="top-nav-left">
+                        <div class="breadcrumb">
+                            <a href="#">首页</a>
+                            <span>›</span>
+                            <span id="breadcrumbCurrent">数据总览</span>
+                        </div>
+                    </div>
+                    <div class="top-nav-right">
+                        <div class="search-bar">
+                            <input type="text" placeholder="搜索机场、政策、案例...">
+                            <span class="icon">🔍</span>
+                        </div>
+                        <div class="notification" onclick="showNotifications()">
+                            <span>🔔</span>
+                            <span class="dot"></span>
+                        </div>
+                        <div class="user-info">
+                            <div class="user-text">
+                                <div class="name">管理员</div>
+                                <div class="role">协会管理员</div>
+                            </div>
+                            <div class="user-avatar">管</div>
+                        </div>
+                    </div>
+                </header>
+
+                <div class="page-content" id="pageContent">
+                </div>
+            </main>
+        </div>
+
+        <div class="modal-overlay" id="notificationModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3>通知消息</h3>
+                    <button class="modal-close" onclick="closeModal('notificationModal')">×</button>
+                </div>
+                <div class="modal-body">
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="time">2026-06-26 09:30</div>
+                            <div class="title">新政策推送</div>
+                            <div class="desc">《民航绿色低碳发展指导意见》已发布，请查看合规预审结果</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="time">2026-06-25 14:20</div>
+                            <div class="title">案例审核通过</div>
+                            <div class="desc">您提交的"光伏屋顶建设案例"已通过审核，已入库</div>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="time">2026-06-25 10:00</div>
+                            <div class="title">预警通知</div>
+                            <div class="desc">XX机场碳排放数据出现异常波动，请关注</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function login() {
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('mainLayout').style.display = 'flex';
+            navigate('dashboard');
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+
+        function navigate(page) {
+            document.getElementById('breadcrumbCurrent').textContent = getPageTitle(page);
+            document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
+            document.getElementById('pageContent').innerHTML = renderPage(page);
+            window.scrollTo(0, 0);
+            
+            if (page === 'dashboard' || page === 'industry') {
+                setTimeout(() => {
+                    initGlobe();
+                }, 100);
+            }
+        }
+
+        function getPageTitle(page) {
+            const titles = {
+                dashboard: '数据总览',
+                analysis: '数据分析与对标',
+                warning: '智能预警',
+                reports: '报告管理',
+                cases: '典型案例库',
+                tech: '新技术推广',
+                standards: '标准制度库',
+                preScore: '评星预打分',
+                compliance: '政策合规预审',
+                carbon: '碳资产管理',
+                esg: 'ESG报告管理',
+                personalize: '个性化提升包',
+                procurement: '集采联盟',
+                contribution: '贡献度评价',
+                industry: '行业典型数据',
+                users: '用户管理',
+                settings: '系统设置'
+            };
+            return titles[page] || '数据总览';
+        }
+
+        function showNotifications() {
+            document.getElementById('notificationModal').classList.add('active');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        function renderPage(page) {
+            switch(page) {
+                case 'dashboard': return renderDashboard();
+                case 'analysis': return renderAnalysis();
+                case 'warning': return renderWarning();
+                case 'reports': return renderReports();
+                case 'cases': return renderCases();
+                case 'tech': return renderTech();
+                case 'standards': return renderStandards();
+                case 'preScore': return renderPreScore();
+                case 'compliance': return renderCompliance();
+                case 'carbon': return renderCarbon();
+                case 'personalize': return renderPersonalize();
+                case 'procurement': return renderProcurement();
+                case 'contribution': return renderContribution();
+                case 'industry': return renderIndustry();
+                default: return renderDashboard();
+            }
+        }
+
+        function renderDashboard() {
+            return `
+                <div class="dashboard-container">
+                    <div class="globe-container" id="globeContainer"></div>
+                    <div class="dashboard-overlay">
+                        <div class="dashboard-header">
+                            <div class="header-title">
+                                <h1>绿色机场数字孪生大屏</h1>
+                                <p>实时监控行业碳排放与绿色发展指标</p>
+                            </div>
+                            <div class="header-controls">
+                                <button class="btn btn-secondary btn-sm" onclick="rotateGlobe('auto')">自动旋转</button>
+                                <button class="btn btn-secondary btn-sm" onclick="rotateGlobe('stop')">停止旋转</button>
+                            </div>
+                        </div>
+                        <div class="kpi-row">
+                            <div class="kpi-card" onclick="navigate('evaluation')">
+                                <div class="kpi-icon">✈</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value">47</div>
+                                    <div class="kpi-label">获星机场</div>
+                                </div>
+                                <div class="kpi-trend up">↑ 12%</div>
+                            </div>
+                            <div class="kpi-card" onclick="navigate('analysis')">
+                                <div class="kpi-icon">📊</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value">620</div>
+                                    <div class="kpi-label">评价单元</div>
+                                </div>
+                                <div class="kpi-trend up">↑ 8%</div>
+                            </div>
+                            <div class="kpi-card" onclick="navigate('report')">
+                                <div class="kpi-icon">📄</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value">128</div>
+                                    <div class="kpi-label">已生成报告</div>
+                                </div>
+                                <div class="kpi-trend up">↑ 15%</div>
+                            </div>
+                            <div class="kpi-card" onclick="navigate('case')">
+                                <div class="kpi-icon">🌱</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value">35</div>
+                                    <div class="kpi-label">典型案例</div>
+                                </div>
+                                <div class="kpi-trend up">↑ 20%</div>
+                            </div>
+                            <div class="kpi-card" onclick="navigate('compliance')">
+                                <div class="kpi-icon">📋</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value">28</div>
+                                    <div class="kpi-label">政策文件</div>
+                                </div>
+                                <div class="kpi-trend up">↑ 5%</div>
+                            </div>
+                            <div class="kpi-card" onclick="navigate('warning')">
+                                <div class="kpi-icon">⚠</div>
+                                <div class="kpi-content">
+                                    <div class="kpi-value">12</div>
+                                    <div class="kpi-label">预警事件</div>
+                                </div>
+                                <div class="kpi-trend down">↓ 30%</div>
+                            </div>
+                        </div>
+                        <div class="dashboard-body">
+                            <div class="left-panel">
+                                <div class="panel-card">
+                                    <div class="panel-header">
+                                        <h3>碳排放趋势</h3>
+                                        <select class="panel-select" onchange="updateChart('carbon')">
+                                            <option>近一年</option>
+                                            <option>近三年</option>
+                                            <option>近五年</option>
+                                        </select>
+                                    </div>
+                                    <div class="mini-chart">
+                                        <svg viewBox="0 0 300 150" style="width:100%;height:100%;">
+                                            <defs>
+                                                <linearGradient id="carbonGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                    <stop offset="0%" style="stop-color:#00CCFF;stop-opacity:0.4" />
+                                                    <stop offset="100%" style="stop-color:#00CCFF;stop-opacity:0" />
+                                                </linearGradient>
+                                            </defs>
+                                            <path d="M10,120 Q40,110 70,105 T130,90 T190,85 T250,75 T290,65 L290,140 L10,140 Z" fill="url(#carbonGradient)"/>
+                                            <path d="M10,120 Q40,110 70,105 T130,90 T190,85 T250,75 T290,65" stroke="#00CCFF" stroke-width="2" fill="none" stroke-linecap="round"/>
+                                            <circle cx="290" cy="65" r="4" fill="#00CCFF"/>
+                                            <circle cx="290" cy="65" r="8" fill="#00CCFF" opacity="0.3"/>
+                                            <text x="25" y="20" fill="#00CCFF" font-size="14" font-weight="bold">65%</text>
+                                            <text x="25" y="135" fill="#666" font-size="10">2025</text>
+                                            <text x="250" y="135" fill="#666" font-size="10">2026</text>
+                                        </svg>
+                                    </div>
+                                    <div class="panel-footer">
+                                        <span>行业碳排放强度下降</span>
+                                        <span class="trend-value">35%</span>
+                                    </div>
+                                </div>
+                                <div class="panel-card">
+                                    <div class="panel-header">
+                                        <h3>星级分布</h3>
+                                    </div>
+                                    <div class="star-distribution">
+                                        <div class="star-item">
+                                            <div class="star-bar three-star"></div>
+                                            <span>三星级</span>
+                                            <span class="star-count">8</span>
+                                        </div>
+                                        <div class="star-item">
+                                            <div class="star-bar two-star"></div>
+                                            <span>二星级</span>
+                                            <span class="star-count">15</span>
+                                        </div>
+                                        <div class="star-item">
+                                            <div class="star-bar one-star"></div>
+                                            <span>一星级</span>
+                                            <span class="star-count">24</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-card">
+                                    <div class="panel-header">
+                                        <h3>实时预警</h3>
+                                        <span class="badge danger">12</span>
+                                    </div>
+                                    <div class="warning-list">
+                                        <div class="warning-item" onclick="navigate('warning')">
+                                            <span class="warning-dot danger"></span>
+                                            <span class="warning-text">北京首都机场碳排放异常</span>
+                                        </div>
+                                        <div class="warning-item" onclick="navigate('warning')">
+                                            <span class="warning-dot warning"></span>
+                                            <span class="warning-text">上海浦东机场数据上报延迟</span>
+                                        </div>
+                                        <div class="warning-item" onclick="navigate('warning')">
+                                            <span class="warning-dot info"></span>
+                                            <span class="warning-text">广州白云机场指标待审核</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="center-panel">
+                                <div class="globe-controls">
+                                    <button class="globe-btn" onclick="zoomGlobe(1.2)">+</button>
+                                    <button class="globe-btn" onclick="zoomGlobe(0.8)">-</button>
+                                    <button class="globe-btn" onclick="resetGlobe()">⟲</button>
+                                </div>
+                                <div class="legend">
+                                    <div class="legend-item">
+                                        <span class="legend-dot three-star"></span>
+                                        <span>三星级机场</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-dot two-star"></span>
+                                        <span>二星级机场</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-dot one-star"></span>
+                                        <span>一星级机场</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="right-panel">
+                                <div class="panel-card" id="airportDetailPanel">
+                                    <div class="panel-header">
+                                        <h3>机场详情</h3>
+                                        <button class="close-btn" onclick="closeAirportDetail()">×</button>
+                                    </div>
+                                    <div class="airport-detail-content">
+                                        <div class="detail-icon">✈</div>
+                                        <h4 class="detail-name">点击地球标记查看详情</h4>
+                                        <p class="detail-hint">选择地图上的机场标记，查看该机场的详细数据和评价指标</p>
+                                    </div>
+                                </div>
+                                <div class="panel-card">
+                                    <div class="panel-header">
+                                        <h3>最新政策动态</h3>
+                                    </div>
+                                    <div class="policy-list">
+                                        <div class="policy-item" onclick="navigate('compliance')">
+                                            <span class="policy-tag">民航局</span>
+                                            <span class="policy-title">民航绿色低碳发展指导意见</span>
+                                            <span class="policy-date">2026-06-20</span>
+                                        </div>
+                                        <div class="policy-item" onclick="navigate('compliance')">
+                                            <span class="policy-tag">生态环境部</span>
+                                            <span class="policy-title">碳排放权交易管理办法</span>
+                                            <span class="policy-date">2026-06-15</span>
+                                        </div>
+                                        <div class="policy-item" onclick="navigate('compliance')">
+                                            <span class="policy-tag">协会</span>
+                                            <span class="policy-title">绿色机场评价标准修订版</span>
+                                            <span class="policy-date">2026-06-10</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="panel-card">
+                                    <div class="panel-header">
+                                        <h3>快速入口</h3>
+                                    </div>
+                                    <div class="quick-links">
+                                        <button class="quick-link-btn" onclick="navigate('evaluation')">评星预打分</button>
+                                        <button class="quick-link-btn" onclick="navigate('analysis')">同类对标分析</button>
+                                        <button class="quick-link-btn" onclick="navigate('report')">生成评价报告</button>
+                                        <button class="quick-link-btn" onclick="navigate('case')">典型案例库</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderAnalysis() {
+            return `
+                <div class="page-title">
+                    <h1>数据分析与对标</h1>
+                    <p>多维度数据分析与同类机场对标</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>对标筛选条件</h3>
+                    </div>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>气候区</label>
+                            <select>
+                                <option>全部气候区</option>
+                                <option>严寒地区</option>
+                                <option>寒冷地区</option>
+                                <option>夏热冬冷地区</option>
+                                <option>夏热冬暖地区</option>
+                                <option>温和地区</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>机场规模</label>
+                            <select>
+                                <option>全部规模</option>
+                                <option>枢纽机场</option>
+                                <option>干线机场</option>
+                                <option>支线机场</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>星级</label>
+                            <select>
+                                <option>全部星级</option>
+                                <option>三星级</option>
+                                <option>二星级</option>
+                                <option>一星级</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>对标指标</label>
+                            <select>
+                                <option>单位旅客吞吐量能耗</option>
+                                <option>单位旅客吞吐量碳排放</option>
+                                <option>可再生能源占比</option>
+                                <option>APU替代率</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                        <button class="btn btn-secondary">重置筛选</button>
+                        <button class="btn btn-primary">开始对标分析</button>
+                    </div>
+                </div>
+                <div class="chart-row">
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <span>能效对标雷达图</span>
+                        </div>
+                        <div class="radar-chart">
+                            <svg viewBox="0 0 300 300" style="width:100%;height:100%;">
+                                <circle cx="150" cy="150" r="100" stroke="#E0E0E0" fill="none"/>
+                                <circle cx="150" cy="150" r="75" stroke="#E0E0E0" fill="none"/>
+                                <circle cx="150" cy="150" r="50" stroke="#E0E0E0" fill="none"/>
+                                <circle cx="150" cy="150" r="25" stroke="#E0E0E0" fill="none"/>
+                                <line x1="150" y1="50" x2="150" y2="250" stroke="#E0E0E0"/>
+                                <line x1="50" y1="150" x2="250" y2="150" stroke="#E0E0E0"/>
+                                <line x1="75" y1="75" x2="225" y2="225" stroke="#E0E0E0"/>
+                                <line x1="225" y1="75" x2="75" y2="225" stroke="#E0E0E0"/>
+                                <path d="M150,60 L185,100 L185,150 L150,180 L115,150 L115,100 Z" fill="#0066CC" opacity="0.3" stroke="#0066CC" stroke-width="2"/>
+                                <text x="150" y="45" fill="#333" font-size="10" text-anchor="middle">综合能效</text>
+                                <text x="200" y="95" fill="#333" font-size="10" text-anchor="middle">碳排放</text>
+                                <text x="200" y="155" fill="#333" font-size="10" text-anchor="middle">能源结构</text>
+                                <text x="150" y="195" fill="#333" font-size="10" text-anchor="middle">管理水平</text>
+                                <text x="90" y="155" fill="#333" font-size="10" text-anchor="middle">技术应用</text>
+                                <text x="90" y="95" fill="#333" font-size="10" text-anchor="middle">创新能力</text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title">
+                            <span>箱线图对标</span>
+                        </div>
+                        <div class="chart-container">
+                            <svg viewBox="0 0 400 200" style="width:100%;height:100%;">
+                                <rect x="20" y="20" width="360" height="160" fill="#F5F7FA" rx="4"/>
+                                <line x1="20" y1="180" x2="380" y2="180" stroke="#E0E0E0"/>
+                                <text x="80" y="195" fill="#999" font-size="10">严寒</text>
+                                <text x="160" y="195" fill="#999" font-size="10">寒冷</text>
+                                <text x="240" y="195" fill="#999" font-size="10">夏热冬冷</text>
+                                <text x="320" y="195" fill="#999" font-size="10">夏热冬暖</text>
+                                <line x1="60" y1="40" x2="100" y2="40" stroke="#0066CC"/>
+                                <line x1="60" y1="140" x2="100" y2="140" stroke="#0066CC"/>
+                                <rect x="60" y="70" width="40" height="60" fill="#0066CC" opacity="0.3" stroke="#0066CC"/>
+                                <line x1="80" y1="70" x2="80" y2="130" stroke="#0066CC" stroke-width="2"/>
+                                <circle cx="80" cy="90" r="4" fill="#0066CC"/>
+                                <line x1="140" y1="50" x2="180" y2="50" stroke="#009933"/>
+                                <line x1="140" y1="130" x2="180" y2="130" stroke="#009933"/>
+                                <rect x="140" y="80" width="40" height="40" fill="#009933" opacity="0.3" stroke="#009933"/>
+                                <line x1="160" y1="80" x2="160" y2="120" stroke="#009933" stroke-width="2"/>
+                                <circle cx="160" cy="100" r="4" fill="#009933"/>
+                                <line x1="220" y1="60" x2="260" y2="60" stroke="#FF9900"/>
+                                <line x1="220" y1="120" x2="260" y2="120" stroke="#FF9900"/>
+                                <rect x="220" y="75" width="40" height="35" fill="#FF9900" opacity="0.3" stroke="#FF9900"/>
+                                <line x1="240" y1="75" x2="240" y2="110" stroke="#FF9900" stroke-width="2"/>
+                                <circle cx="240" cy="95" r="4" fill="#FF9900"/>
+                                <line x1="300" y1="70" x2="340" y2="70" stroke="#9933CC"/>
+                                <line x1="300" y1="110" x2="340" y2="110" stroke="#9933CC"/>
+                                <rect x="300" y="80" width="40" height="20" fill="#9933CC" opacity="0.3" stroke="#9933CC"/>
+                                <line x1="320" y1="80" x2="320" y2="100" stroke="#9933CC" stroke-width="2"/>
+                                <circle cx="320" cy="90" r="4" fill="#9933CC"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>对标结果详情</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>排名</th><th>机场名称</th><th>气候区</th><th>规模</th><th>指标值</th><th>与中位数差距</th><th>百分位</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>深圳宝安国际机场</td>
+                                <td>夏热冬暖</td>
+                                <td>枢纽机场</td>
+                                <td>12.5 kWh/人次</td>
+                                <td><span class="badge success">-25%</span></td>
+                                <td>95%</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>杭州萧山国际机场</td>
+                                <td>夏热冬冷</td>
+                                <td>枢纽机场</td>
+                                <td>13.8 kWh/人次</td>
+                                <td><span class="badge success">-18%</span></td>
+                                <td>92%</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>成都天府国际机场</td>
+                                <td>温和地区</td>
+                                <td>枢纽机场</td>
+                                <td>14.2 kWh/人次</td>
+                                <td><span class="badge success">-15%</span></td>
+                                <td>90%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderWarning() {
+            return `
+                <div class="page-title">
+                    <h1>智能预警</h1>
+                    <p>实时监控数据异常，及时预警风险</p>
+                </div>
+                <div class="tabs">
+                    <button class="tab active">全部预警</button>
+                    <button class="tab">待处理</button>
+                    <button class="tab">处理中</button>
+                    <button class="tab">已关闭</button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>预警编号</th><th>机场名称</th><th>预警类型</th><th>预警等级</th><th>预警时间</th><th>预警内容</th><th>状态</th><th>操作</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>YW20260626001</td>
+                                <td>北京首都国际机场</td>
+                                <td>碳排放异常</td>
+                                <td><span class="badge danger">严重</span></td>
+                                <td>2026-06-26 09:30</td>
+                                <td>碳排放量同比增长超过30%，请核实</td>
+                                <td><span class="badge warning">待处理</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">处理</button>
+                                    <button class="btn btn-sm btn-secondary">关闭</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>YW20260625002</td>
+                                <td>上海浦东国际机场</td>
+                                <td>数据上报延迟</td>
+                                <td><span class="badge warning">一般</span></td>
+                                <td>2026-06-25 14:20</td>
+                                <td>本月数据上报已延迟3天，请及时上报</td>
+                                <td><span class="badge info">处理中</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">查看进度</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>YW20260625001</td>
+                                <td>广州白云国际机场</td>
+                                <td>指标不达标</td>
+                                <td><span class="badge warning">一般</span></td>
+                                <td>2026-06-25 10:00</td>
+                                <td>APU替代率未达到评价要求</td>
+                                <td><span class="badge success">已关闭</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary">查看详情</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>预警统计</h3>
+                    </div>
+                    <div class="chart-row">
+                        <div style="background: #F5F7FA; border-radius: 8px; padding: 20px;">
+                            <div style="text-align: center; margin-bottom: 16px;">
+                                <div style="font-size: 36px; font-weight: bold; color: #CC0000;">3</div>
+                                <div style="font-size: 14px; color: #666;">待处理预警</div>
+                            </div>
+                            <div class="progress-bar">
+                                <div class="progress" style="width: 75%;"></div>
+                            </div>
+                            <div style="font-size: 12px; color: #999; margin-top: 8px;">本月预警处理率 75%</div>
+                        </div>
+                        <div style="background: #F5F7FA; border-radius: 8px; padding: 20px;">
+                            <div style="display: flex; justify-content: space-around;">
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #CC0000;">5</div>
+                                    <div style="font-size: 12px; color: #666;">严重</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #FF9900;">12</div>
+                                    <div style="font-size: 12px; color: #666;">一般</div>
+                                </div>
+                                <div style="text-align: center;">
+                                    <div style="font-size: 24px; font-weight: bold; color: #0066CC;">8</div>
+                                    <div style="font-size: 12px; color: #666;">提示</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderReports() {
+            return `
+                <div class="page-title">
+                    <h1>报告管理</h1>
+                    <p>报告生成、查看与管理</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>报告模板库</h3>
+                        <button class="btn btn-primary">新建模板</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>模板名称</th><th>类型</th><th>适用范围</th><th>创建时间</th><th>操作</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>能源分析报告</td>
+                                <td><span class="badge info">分析报告</span></td>
+                                <td>全部机场</td>
+                                <td>2026-06-01</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">使用</button>
+                                    <button class="btn btn-sm btn-secondary">编辑</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>碳排放报告</td>
+                                <td><span class="badge info">分析报告</span></td>
+                                <td>全部机场</td>
+                                <td>2026-06-01</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">使用</button>
+                                    <button class="btn btn-sm btn-secondary">编辑</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>碳核查报告</td>
+                                <td><span class="badge info">核查报告</span></td>
+                                <td>试点机场</td>
+                                <td>2026-06-05</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">使用</button>
+                                    <button class="btn btn-sm btn-secondary">编辑</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>已生成报告</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>报告名称</th><th>机场</th><th>报告类型</th><th>生成时间</th><th>状态</th><th>操作</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>北京首都机场2026年能源分析报告</td>
+                                <td>北京首都国际机场</td>
+                                <td>能源分析报告</td>
+                                <td>2026-06-26</td>
+                                <td><span class="badge success">已完成</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">下载</button>
+                                    <button class="btn btn-sm btn-secondary">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>上海浦东机场2026年碳排放报告</td>
+                                <td>上海浦东国际机场</td>
+                                <td>碳排放报告</td>
+                                <td>2026-06-25</td>
+                                <td><span class="badge success">已完成</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary">下载</button>
+                                    <button class="btn btn-sm btn-secondary">查看</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>广州白云机场2026年碳核查报告</td>
+                                <td>广州白云国际机场</td>
+                                <td>碳核查报告</td>
+                                <td>2026-06-24</td>
+                                <td><span class="badge info">生成中</span></td>
+                                <td>
+                                    <button class="btn btn-sm btn-secondary">查看进度</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderCases() {
+            return `
+                <div class="page-title">
+                    <h1>典型案例库</h1>
+                    <p>绿色机场建设优秀实践案例</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>案例列表</h3>
+                        <button class="btn btn-primary">上传案例</button>
+                    </div>
+                    <div class="form-grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                        <div style="background: #F5F7FA; border-radius: 8px; padding: 16px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">光伏屋顶建设案例</div>
+                            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">深圳宝安国际机场</div>
+                            <div style="font-size: 12px; color: #999; margin-bottom: 12px;">节能改造 · 可再生能源</div>
+                            <button class="btn btn-sm btn-primary" style="width: 100%;">查看详情</button>
+                        </div>
+                        <div style="background: #F5F7FA; border-radius: 8px; padding: 16px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">APU替代项目</div>
+                            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">北京首都国际机场</div>
+                            <div style="font-size: 12px; color: #999; margin-bottom: 12px;">节能减排 · 设备改造</div>
+                            <button class="btn btn-sm btn-primary" style="width: 100%;">查看详情</button>
+                        </div>
+                        <div style="background: #F5F7FA; border-radius: 8px; padding: 16px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 8px;">地源热泵应用</div>
+                            <div style="font-size: 12px; color: #666; margin-bottom: 8px;">杭州萧山国际机场</div>
+                            <div style="font-size: 12px; color: #999; margin-bottom: 12px;">节能改造 · 暖通系统</div>
+                            <button class="btn btn-sm btn-primary" style="width: 100%;">查看详情</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderTech() {
+            return `
+                <div class="page-title">
+                    <h1>新技术推广</h1>
+                    <p>新技术案例分享与推广</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>技术案例库</h3>
+                        <button class="btn btn-primary">发布案例</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>技术名称</th><th>案例来源</th><th>技术标签</th><th>发布时间</th><th>状态</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>分布式光伏技术</td>
+                                <td>深圳宝安国际机场</td>
+                                <td><span class="badge success">可再生能源</span></td>
+                                <td>2026-06-20</td>
+                                <td><span class="badge success">已发布</span></td>
+                            </tr>
+                            <tr>
+                                <td>充电桩智能管理系统</td>
+                                <td>上海浦东国际机场</td>
+                                <td><span class="badge info">智能管理</span></td>
+                                <td>2026-06-18</td>
+                                <td><span class="badge success">已发布</span></td>
+                            </tr>
+                            <tr>
+                                <td>建筑节能改造技术</td>
+                                <td>广州白云国际机场</td>
+                                <td><span class="badge warning">节能改造</span></td>
+                                <td>2026-06-15</td>
+                                <td><span class="badge info">审核中</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderStandards() {
+            return `
+                <div class="page-title">
+                    <h1>标准制度库</h1>
+                    <p>国家、行业、地方、团体标准与政策文件</p>
+                </div>
+                <div class="tabs">
+                    <button class="tab active">全部标准</button>
+                    <button class="tab">国家标准</button>
+                    <button class="tab">行业标准</button>
+                    <button class="tab">地方标准</button>
+                    <button class="tab">团体标准</button>
+                </div>
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>标准编号</th><th>标准名称</th><th>类型</th><th>发布单位</th><th>发布时间</th><th>操作</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>MH/T 5112</td>
+                                <td>民用机场能源消耗指标</td>
+                                <td><span class="badge info">行业标准</span></td>
+                                <td>民航局</td>
+                                <td>2024-01-01</td>
+                                <td><button class="btn btn-sm btn-primary">查看</button></td>
+                            </tr>
+                            <tr>
+                                <td>T/CAA 001</td>
+                                <td>绿色机场评价标准</td>
+                                <td><span class="badge success">团体标准</span></td>
+                                <td>中国民用机场协会</td>
+                                <td>2025-06-01</td>
+                                <td><button class="btn btn-sm btn-primary">查看</button></td>
+                            </tr>
+                            <tr>
+                                <td>GB/T 32151</td>
+                                <td>温室气体排放核算与报告要求</td>
+                                <td><span class="badge warning">国家标准</span></td>
+                                <td>国家市场监督管理总局</td>
+                                <td>2015-06-01</td>
+                                <td><button class="btn btn-sm btn-primary">查看</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderPreScore() {
+            return `
+                <div class="page-title">
+                    <h1>评星预打分</h1>
+                    <p>仅做打分功能，不做星级预测、差距分析</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>预打分任务</h3>
+                        <button class="btn btn-primary">新建打分任务</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>任务名称</th><th>机场</th><th>评价年份</th><th>进度</th><th>状态</th><th>操作</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2026年度预打分</td>
+                                <td>北京首都国际机场</td>
+                                <td>2026</td>
+                                <td>
+                                    <div class="progress-bar"><div class="progress" style="width: 75%;"></div></div>
+                                    <div style="font-size: 12px; color: #999;">75%</div>
+                                </td>
+                                <td><span class="badge info">进行中</span></td>
+                                <td><button class="btn btn-sm btn-primary">继续打分</button></td>
+                            </tr>
+                            <tr>
+                                <td>2026年度预打分</td>
+                                <td>上海浦东国际机场</td>
+                                <td>2026</td>
+                                <td>
+                                    <div class="progress-bar"><div class="progress" style="width: 100%;"></div></div>
+                                    <div style="font-size: 12px; color: #999;">100%</div>
+                                </td>
+                                <td><span class="badge success">已完成</span></td>
+                                <td><button class="btn btn-sm btn-secondary">查看结果</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderCompliance() {
+            return `
+                <div class="page-title">
+                    <h1>政策合规预审</h1>
+                    <p>政策标准知识库与合规自检</p>
+                </div>
+                <div class="tabs">
+                    <button class="tab active">政策推送</button>
+                    <button class="tab">合规自检</button>
+                    <button class="tab">偏差预警</button>
+                    <button class="tab">行业态势</button>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>最新政策推送</h3>
+                    </div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="time">2026-06-20</div>
+                            <div class="title">民航绿色低碳发展指导意见</div>
+                            <div class="desc">民航局发布，适用于全行业机场。主要内容包括碳排放强度控制目标、可再生能源占比要求等</div>
+                            <button class="btn btn-sm btn-primary" style="margin-top: 8px;">查看详情</button>
+                        </div>
+                        <div class="timeline-item">
+                            <div class="time">2026-06-15</div>
+                            <div class="title">碳排放权交易管理办法</div>
+                            <div class="desc">生态环境部发布，适用于试点机场。主要内容包括碳配额分配、交易规则等</div>
+                            <button class="btn btn-sm btn-primary" style="margin-top: 8px;">查看详情</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCarbon() {
+            return `
+                <div class="page-title">
+                    <h1>碳资产管理</h1>
+                    <p>模拟碳交易与碳账户管理</p>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">🌍</div>
+                        <div class="stat-content">
+                            <div class="value">125万</div>
+                            <div class="label">碳排放总量（吨CO₂）</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">📈</div>
+                        <div class="stat-content">
+                            <div class="value">15%</div>
+                            <div class="label">减排率</div>
+                            <div class="trend up">↑ 5% 同比增长</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">💰</div>
+                        <div class="stat-content">
+                            <div class="value">¥850</div>
+                            <div class="label">碳价（元/吨）</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">⚡</div>
+                        <div class="stat-content">
+                            <div class="value">28%</div>
+                            <div class="label">可再生能源占比</div>
+                            <div class="trend up">↑ 8% 同比增长</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>碳账户概览</h3>
+                    </div>
+                    <div class="chart-row">
+                        <div class="chart-card">
+                            <div class="chart-title">碳排放结构</div>
+                            <div class="pie-chart">
+                                <svg viewBox="0 0 200 200" style="width:100%;height:100%;">
+                                    <circle cx="100" cy="100" r="80" fill="#0066CC" stroke="#0066CC" stroke-width="80" stroke-dasharray="251.2 502.4" transform="rotate(-90 100 100)"/>
+                                    <circle cx="100" cy="100" r="80" fill="#00CCFF" stroke="#00CCFF" stroke-width="80" stroke-dasharray="150.72 502.4" transform="rotate(72 100 100)"/>
+                                    <circle cx="100" cy="100" r="80" fill="#009933" stroke="#009933" stroke-width="80" stroke-dasharray="100.48 502.4" transform="rotate(180 100 100)"/>
+                                    <text x="100" y="100" fill="#333" font-size="14" text-anchor="middle" dominant-baseline="middle">碳排放</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">碳交易记录</div>
+                            <table class="data-table" style="font-size: 12px;">
+                                <thead><tr><th>日期</th><th>类型</th><th>数量(吨)</th><th>价格(元)</th><th>状态</th></tr></thead>
+                                <tbody>
+                                    <tr><td>2026-06-20</td><td>买入</td><td>1000</td><td>850</td><td><span class="badge success">已完成</span></td></tr>
+                                    <tr><td>2026-06-15</td><td>卖出</td><td>500</td><td>880</td><td><span class="badge success">已完成</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPersonalize() {
+            return `
+                <div class="page-title">
+                    <h1>个性化提升包</h1>
+                    <p>基于机场画像的个性化提升建议</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>机场画像卡</h3>
+                    </div>
+                    <div class="chart-row">
+                        <div class="chart-card">
+                            <div class="chart-title">北京首都国际机场</div>
+                            <div class="radar-chart">
+                                <svg viewBox="0 0 300 300" style="width:100%;height:100%;">
+                                    <circle cx="150" cy="150" r="100" stroke="#E0E0E0" fill="none"/>
+                                    <circle cx="150" cy="150" r="75" stroke="#E0E0E0" fill="none"/>
+                                    <circle cx="150" cy="150" r="50" stroke="#E0E0E0" fill="none"/>
+                                    <circle cx="150" cy="150" r="25" stroke="#E0E0E0" fill="none"/>
+                                    <line x1="150" y1="50" x2="150" y2="250" stroke="#E0E0E0"/>
+                                    <line x1="50" y1="150" x2="250" y2="150" stroke="#E0E0E0"/>
+                                    <line x1="75" y1="75" x2="225" y2="225" stroke="#E0E0E0"/>
+                                    <line x1="225" y1="75" x2="75" y2="225" stroke="#E0E0E0"/>
+                                    <path d="M150,60 L180,95 L185,150 L150,175 L115,150 L120,95 Z" fill="#009933" opacity="0.3" stroke="#009933" stroke-width="2"/>
+                                    <text x="150" y="45" fill="#333" font-size="10" text-anchor="middle">综合能效</text>
+                                    <text x="200" y="95" fill="#333" font-size="10" text-anchor="middle">碳排放</text>
+                                    <text x="200" y="155" fill="#333" font-size="10" text-anchor="middle">能源结构</text>
+                                    <text x="150" y="195" fill="#333" font-size="10" text-anchor="middle">管理水平</text>
+                                    <text x="90" y="155" fill="#333" font-size="10" text-anchor="middle">技术应用</text>
+                                    <text x="90" y="95" fill="#333" font-size="10" text-anchor="middle">创新能力</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">提升建议</div>
+                            <div style="padding: 16px;">
+                                <div style="background: #FFF2E6; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                                    <div style="font-weight: 600; color: #FF9900; margin-bottom: 4px;">建议1：提升APU替代率</div>
+                                    <div style="font-size: 13px; color: #666;">当前APU替代率为65%，建议目标提升至80%，预计可减少碳排放15%</div>
+                                </div>
+                                <div style="background: #E6F2FF; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+                                    <div style="font-weight: 600; color: #0066CC; margin-bottom: 4px;">建议2：增加可再生能源装机</div>
+                                    <div style="font-size: 13px; color: #666;">当前可再生能源占比15%，建议新增光伏装机容量，目标提升至25%</div>
+                                </div>
+                                <div style="background: #E6FFF2; border-radius: 8px; padding: 12px;">
+                                    <div style="font-weight: 600; color: #009933; margin-bottom: 4px;">建议3：优化能源管理系统</div>
+                                    <div style="font-size: 13px; color: #666;">完善能耗监测系统，实现精细化能源管理</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProcurement() {
+            return `
+                <div class="page-title">
+                    <h1>集采联盟</h1>
+                    <p>绿色低碳供应链协同采购</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>集采需求池</h3>
+                        <button class="btn btn-primary">发布需求</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>需求名称</th><th>发起机场</th><th>采购品类</th><th>预计数量</th><th>状态</th><th>操作</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>光伏组件采购</td>
+                                <td>深圳宝安国际机场</td>
+                                <td>光伏组件</td>
+                                <td>10MW</td>
+                                <td><span class="badge info">招募中</span></td>
+                                <td><button class="btn btn-sm btn-primary">参与</button></td>
+                            </tr>
+                            <tr>
+                                <td>充电桩采购</td>
+                                <td>上海浦东国际机场</td>
+                                <td>充电桩</td>
+                                <td>50个</td>
+                                <td><span class="badge success">已完成</span></td>
+                                <td><button class="btn btn-sm btn-secondary">查看结果</button></td>
+                            </tr>
+                            <tr>
+                                <td>节能灯具采购</td>
+                                <td>广州白云国际机场</td>
+                                <td>LED灯具</td>
+                                <td>5000套</td>
+                                <td><span class="badge warning">议价中</span></td>
+                                <td><button class="btn btn-sm btn-primary">参与</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderContribution() {
+            return `
+                <div class="page-title">
+                    <h1>贡献度评价</h1>
+                    <p>会员单位贡献度评估与排行</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>贡献度排行榜</h3>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>排名</th><th>机场名称</th><th>贡献度积分</th><th>案例上报</th><th>专家答疑</th><th>培训参与</th><th>荣誉称号</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>1</td>
+                                <td>北京首都国际机场</td>
+                                <td>850</td>
+                                <td>12</td>
+                                <td>8</td>
+                                <td>6</td>
+                                <td><span class="badge danger">金牌贡献单位</span></td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>上海浦东国际机场</td>
+                                <td>780</td>
+                                <td>10</td>
+                                <td>6</td>
+                                <td>5</td>
+                                <td><span class="badge warning">银牌贡献单位</span></td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>广州白云国际机场</td>
+                                <td>720</td>
+                                <td>8</td>
+                                <td>5</td>
+                                <td>4</td>
+                                <td><span class="badge info">铜牌贡献单位</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderIndustry() {
+            return `
+                <div class="page-title">
+                    <h1>行业典型数据</h1>
+                    <p>对外展示行业绿色发展成就</p>
+                </div>
+                <div class="dark-container" style="margin-bottom: 24px;">
+                    <div class="dark-title">行业碳排放总体趋势</div>
+                    <div class="chart-dark-bg" style="padding: 20px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; position: relative; z-index: 1;">
+                            <div>
+                                <span class="glow-text" style="font-size: 32px; font-weight: bold;">1258.6</span>
+                                <span style="color: #666; font-size: 14px;">万吨CO₂</span>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="color: #00FF88; font-size: 16px; font-weight: 600; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);">↓ 12.5%</div>
+                                <div style="color: #666; font-size: 12px;">较上年减排</div>
+                            </div>
+                        </div>
+                        <div style="height: 200px; position: relative;">
+                            <svg viewBox="0 0 600 200" style="width:100%;height:100%;">
+                                <defs>
+                                    <linearGradient id="cyberGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#00CCFF;stop-opacity:0.4" />
+                                        <stop offset="100%" style="stop-color:#00CCFF;stop-opacity:0" />
+                                    </linearGradient>
+                                    <filter id="glow">
+                                        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur"/>
+                                            <feMergeNode in="SourceGraphic"/>
+                                        </feMerge>
+                                    </filter>
+                                </defs>
+                                <rect x="40" y="10" width="540" height="170" fill="rgba(0,20,40,0.5)" rx="4"/>
+                                <line x1="40" y1="180" x2="580" y2="180" stroke="rgba(0,204,255,0.2)"/>
+                                <line x1="40" y1="40" x2="40" y2="180" stroke="rgba(0,204,255,0.2)"/>
+                                <line x1="40" y1="80" x2="580" y2="80" stroke="rgba(0,204,255,0.1)"/>
+                                <line x1="40" y1="120" x2="580" y2="120" stroke="rgba(0,204,255,0.1)"/>
+                                <line x1="40" y1="160" x2="580" y2="160" stroke="rgba(0,204,255,0.1)"/>
+                                <text x="40" y="195" fill="#00CCFF" font-size="11" text-shadow="0 0 5px rgba(0,204,255,0.5)">2021</text>
+                                <text x="125" y="195" fill="#00CCFF" font-size="11" text-shadow="0 0 5px rgba(0,204,255,0.5)">2022</text>
+                                <text x="210" y="195" fill="#00CCFF" font-size="11" text-shadow="0 0 5px rgba(0,204,255,0.5)">2023</text>
+                                <text x="295" y="195" fill="#00CCFF" font-size="11" text-shadow="0 0 5px rgba(0,204,255,0.5)">2024</text>
+                                <text x="380" y="195" fill="#00CCFF" font-size="11" text-shadow="0 0 5px rgba(0,204,255,0.5)">2025</text>
+                                <text x="465" y="195" fill="#00CCFF" font-size="11" text-shadow="0 0 5px rgba(0,204,255,0.5)">2026</text>
+                                <text x="15" y="40" fill="#666" font-size="10">100%</text>
+                                <text x="15" y="80" fill="#666" font-size="10">75%</text>
+                                <text x="15" y="120" fill="#666" font-size="10">50%</text>
+                                <text x="15" y="160" fill="#666" font-size="10">25%</text>
+                                <path d="M40,140 Q65,135 90,130 T140,120 T190,110 T240,100 T290,90 T340,85 T390,80 T440,75 T490,70 T540,65 L540,180 L40,180 Z" fill="url(#cyberGradient)"/>
+                                <path d="M40,140 Q65,135 90,130 T140,120 T190,110 T240,100 T290,90 T340,85 T390,80 T440,75 T490,70 T540,65" stroke="#00CCFF" stroke-width="2.5" fill="none" filter="url(#glow)"/>
+                                <circle cx="40" cy="140" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="90" cy="130" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="140" cy="120" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="190" cy="110" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="240" cy="100" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="290" cy="90" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="340" cy="85" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="390" cy="80" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="440" cy="75" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="490" cy="70" r="4" fill="#00CCFF" filter="url(#glow)"/>
+                                <circle cx="540" cy="65" r="6" fill="#00FF88" filter="url(#glow)"/>
+                            </svg>
+                        </div>
+                        <div style="display: flex; justify-content: space-around; margin-top: 16px; position: relative; z-index: 1;">
+                            <div style="text-align: center;">
+                                <div class="glow-text" style="font-size: 18px; font-weight: 600;">28%</div>
+                                <div style="color: #666; font-size: 12px;">可再生能源占比</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div class="glow-text" style="font-size: 18px; font-weight: 600;">15%</div>
+                                <div style="color: #666; font-size: 12px;">单位能耗下降</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div class="glow-text" style="font-size: 18px; font-weight: 600;">89%</div>
+                                <div style="color: #666; font-size: 12px;">APU替代率</div>
+                            </div>
+                            <div style="text-align: center;">
+                                <div class="glow-text" style="font-size: 18px; font-weight: 600;">45%</div>
+                                <div style="color: #666; font-size: 12px;">机场覆盖率</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dark-container">
+                    <div class="dark-title">绿色机场地图</div>
+                    <div class="three-container" id="globeContainer">
+                        <canvas id="globeCanvas"></canvas>
+                        <div class="globe-info">中国民用机场绿色发展分布 | 实时数据映射</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>典型机场绿色成就</h3>
+                        <button class="btn btn-primary">导出媒体素材包</button>
+                    </div>
+                    <div class="form-grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                        <div style="background: #E6FFF2; border-radius: 8px; padding: 16px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">深圳宝安国际机场</div>
+                            <div style="font-size: 12px; color: #009933; margin-bottom: 8px;">⭐⭐⭐ 三星级绿色机场</div>
+                            <div style="font-size: 12px; color: #666;">光伏装机容量20MW，可再生能源占比30%</div>
+                        </div>
+                        <div style="background: #FFF2E6; border-radius: 8px; padding: 16px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">杭州萧山国际机场</div>
+                            <div style="font-size: 12px; color: #FF9900; margin-bottom: 8px;">⭐⭐ 二星级绿色机场</div>
+                            <div style="font-size: 12px; color: #666;">地源热泵系统应用，年节能率15%</div>
+                        </div>
+                        <div style="background: #E6F2FF; border-radius: 8px; padding: 16px;">
+                            <div style="font-size: 14px; font-weight: 600; margin-bottom: 4px;">成都天府国际机场</div>
+                            <div style="font-size: 12px; color: #0066CC; margin-bottom: 8px;">⭐ 一星级绿色机场</div>
+                            <div style="font-size: 12px; color: #666;">APU替代率90%，国内领先水平</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        let globeScene = null;
+        let globeCamera = null;
+        let globeRenderer = null;
+        let globeMesh = null;
+        let gridHelper = null;
+        let airportGroup = null;
+        let particles = null;
+        let isAutoRotating = true;
+
+        function initGlobe() {
+            const container = document.getElementById('globeContainer');
+            if (!container || typeof THREE === 'undefined') return;
+
+            if (globeRenderer) {
+                globeRenderer.dispose();
+            }
+
+            const width = container.offsetWidth;
+            const height = container.offsetHeight;
+            
+            globeScene = new THREE.Scene();
+            globeCamera = new THREE.PerspectiveCamera(60, width / height, 0.1, 1000);
+            globeRenderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            
+            globeRenderer.setSize(width, height);
+            globeRenderer.setPixelRatio(window.devicePixelRatio);
+            container.innerHTML = '';
+            container.appendChild(globeRenderer.domElement);
+
+            const globeGeometry = new THREE.SphereGeometry(2, 64, 64);
+            const globeMaterial = new THREE.MeshPhongMaterial({
+                color: 0x0d2137,
+                transparent: true,
+                opacity: 0.9,
+                shininess: 10,
+                specular: 0x00CCFF
+            });
+            globeMesh = new THREE.Mesh(globeGeometry, globeMaterial);
+            globeScene.add(globeMesh);
+
+            gridHelper = new THREE.Group();
+            for (let i = 0; i <= 10; i++) {
+                const latGeometry = new THREE.RingGeometry(
+                    2.02, 2.04, 64, 1,
+                    Math.PI * (-0.5 + i * 0.1), Math.PI * 0.1
+                );
+                const latMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x00CCFF,
+                    transparent: true,
+                    opacity: 0.15,
+                    side: THREE.DoubleSide
+                });
+                const latRing = new THREE.Mesh(latGeometry, latMaterial);
+                latRing.rotation.x = Math.PI / 2;
+                gridHelper.add(latRing);
+            }
+            for (let i = 0; i < 20; i++) {
+                const lonGeometry = new THREE.RingGeometry(2.02, 2.04, 64, 1);
+                const lonMaterial = new THREE.MeshBasicMaterial({
+                    color: 0x00CCFF,
+                    transparent: true,
+                    opacity: 0.1,
+                    side: THREE.DoubleSide
+                });
+                const lonRing = new THREE.Mesh(lonGeometry, lonMaterial);
+                lonRing.rotation.y = i * (Math.PI / 10);
+                gridHelper.add(lonRing);
+            }
+            globeScene.add(gridHelper);
+
+            const airports = [
+                { name: '北京首都国际机场', lat: 39.9942, lng: 116.4775, level: 3, carbon: 85.2, energy: 92.5, waste: 88.3 },
+                { name: '上海浦东国际机场', lat: 31.1443, lng: 121.8083, level: 3, carbon: 82.8, energy: 90.1, waste: 85.6 },
+                { name: '广州白云国际机场', lat: 23.3959, lng: 113.2968, level: 3, carbon: 80.5, energy: 88.3, waste: 82.1 },
+                { name: '深圳宝安国际机场', lat: 22.6393, lng: 113.8102, level: 3, carbon: 88.1, energy: 94.2, waste: 90.5 },
+                { name: '成都天府国际机场', lat: 30.3348, lng: 104.4462, level: 2, carbon: 75.3, energy: 82.1, waste: 78.6 },
+                { name: '杭州萧山国际机场', lat: 30.2231, lng: 120.4393, level: 2, carbon: 77.6, energy: 84.5, waste: 80.2 },
+                { name: '重庆江北国际机场', lat: 29.7173, lng: 106.6492, level: 2, carbon: 72.1, energy: 79.8, waste: 76.3 },
+                { name: '西安咸阳国际机场', lat: 34.3416, lng: 108.7424, level: 2, carbon: 74.8, energy: 81.2, waste: 77.9 },
+                { name: '武汉天河国际机场', lat: 30.7389, lng: 114.2866, level: 1, carbon: 68.5, energy: 75.2, waste: 72.1 },
+                { name: '南京禄口国际机场', lat: 31.8124, lng: 118.8163, level: 1, carbon: 69.2, energy: 76.8, waste: 73.5 },
+                { name: '青岛胶东国际机场', lat: 36.3423, lng: 120.3858, level: 1, carbon: 70.1, energy: 77.3, waste: 74.2 },
+                { name: '厦门高崎国际机场', lat: 24.5443, lng: 118.1242, level: 1, carbon: 71.5, energy: 78.6, waste: 75.8 },
+                { name: '昆明长水国际机场', lat: 24.9029, lng: 102.8989, level: 2, carbon: 73.8, energy: 80.5, waste: 77.1 },
+                { name: '乌鲁木齐地窝堡国际机场', lat: 43.9163, lng: 87.4912, level: 1, carbon: 65.2, energy: 72.1, waste: 69.8 },
+                { name: '哈尔滨太平国际机场', lat: 45.6147, lng: 126.5375, level: 1, carbon: 66.8, energy: 73.5, waste: 71.2 }
+            ];
+
+            airportGroup = new THREE.Group();
+            airports.forEach(airport => {
+                const phi = (90 - airport.lat) * (Math.PI / 180);
+                const theta = (airport.lng + 180) * (Math.PI / 180);
+                
+                const x = 2.1 * Math.sin(phi) * Math.cos(theta);
+                const y = 2.1 * Math.cos(phi);
+                const z = 2.1 * Math.sin(phi) * Math.sin(theta);
+                
+                const markerGeometry = new THREE.SphereGeometry(0.03 + airport.level * 0.01, 16, 16);
+                const markerColor = airport.level === 3 ? 0x00FF88 : airport.level === 2 ? 0x00CCFF : 0xFF9900;
+                const markerMaterial = new THREE.MeshBasicMaterial({ color: markerColor });
+                const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+                marker.position.set(x, y, z);
+                marker.userData = { type: 'airport', airport: airport };
+                airportGroup.add(marker);
+
+                const pulseGeometry = new THREE.SphereGeometry(0.05 + airport.level * 0.02, 16, 16);
+                const pulseMaterial = new THREE.MeshBasicMaterial({
+                    color: markerColor,
+                    transparent: true,
+                    opacity: 0.5
+                });
+                const pulse = new THREE.Mesh(pulseGeometry, pulseMaterial);
+                pulse.position.set(x, y, z);
+                pulse.userData = { type: 'pulse', originalScale: 1, color: markerColor };
+                airportGroup.add(pulse);
+            });
+            globeScene.add(airportGroup);
+
+            const particleCount = 200;
+            const particleGeometry = new THREE.BufferGeometry();
+            const particlePositions = new Float32Array(particleCount * 3);
+            const particleColors = new Float32Array(particleCount * 3);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const radius = 2.5 + Math.random() * 2;
+                const theta = Math.random() * Math.PI * 2;
+                const phi = Math.random() * Math.PI;
+                
+                particlePositions[i * 3] = radius * Math.sin(phi) * Math.cos(theta);
+                particlePositions[i * 3 + 1] = radius * Math.cos(phi);
+                particlePositions[i * 3 + 2] = radius * Math.sin(phi) * Math.sin(theta);
+                
+                particleColors[i * 3] = 0;
+                particleColors[i * 3 + 1] = 0.8;
+                particleColors[i * 3 + 2] = 1;
+            }
+            
+            particleGeometry.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+            particleGeometry.setAttribute('color', new THREE.BufferAttribute(particleColors, 3));
+            
+            const particleMaterial = new THREE.PointsMaterial({
+                size: 0.02,
+                vertexColors: true,
+                transparent: true,
+                opacity: 0.6
+            });
+            
+            particles = new THREE.Points(particleGeometry, particleMaterial);
+            globeScene.add(particles);
+
+            const ambientLight = new THREE.AmbientLight(0x00CCFF, 0.4);
+            globeScene.add(ambientLight);
+            
+            const pointLight = new THREE.PointLight(0x00CCFF, 1, 100);
+            pointLight.position.set(10, 10, 10);
+            globeScene.add(pointLight);
+
+            globeCamera.position.z = 6;
+
+            let isDragging = false;
+            let previousMousePosition = { x: 0, y: 0 };
+
+            container.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            container.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                isAutoRotating = false;
+                const deltaMove = {
+                    x: e.clientX - previousMousePosition.x,
+                    y: e.clientY - previousMousePosition.y
+                };
+                globeMesh.rotation.y += deltaMove.x * 0.005;
+                globeMesh.rotation.x += deltaMove.y * 0.005;
+                gridHelper.rotation.y += deltaMove.x * 0.005;
+                gridHelper.rotation.x += deltaMove.y * 0.005;
+                airportGroup.rotation.y += deltaMove.x * 0.005;
+                airportGroup.rotation.x += deltaMove.y * 0.005;
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            });
+
+            container.addEventListener('mouseup', () => {
+                isDragging = false;
+            });
+
+            container.addEventListener('mouseleave', () => {
+                isDragging = false;
+            });
+
+            container.addEventListener('wheel', (e) => {
+                e.preventDefault();
+                globeCamera.position.z += e.deltaY * 0.005;
+                globeCamera.position.z = Math.max(4, Math.min(10, globeCamera.position.z));
+            });
+
+            container.addEventListener('click', (e) => {
+                const rect = container.getBoundingClientRect();
+                const mouse = new THREE.Vector2(
+                    ((e.clientX - rect.left) / rect.width) * 2 - 1,
+                    -((e.clientY - rect.top) / rect.height) * 2 + 1
+                );
+                
+                const raycaster = new THREE.Raycaster();
+                raycaster.setFromCamera(mouse, globeCamera);
+                
+                const intersects = raycaster.intersectObjects(airportGroup.children);
+                
+                for (const intersect of intersects) {
+                    if (intersect.object.userData.type === 'airport') {
+                        const airport = intersect.object.userData.airport;
+                        showAirportDetail(airport);
+                        return;
+                    }
+                }
+            });
+
+            function animate() {
+                requestAnimationFrame(animate);
+                if (isAutoRotating) {
+                    globeMesh.rotation.y += 0.001;
+                    gridHelper.rotation.y += 0.001;
+                    airportGroup.rotation.y += 0.001;
+                }
+                
+                airportGroup.children.forEach(child => {
+                    if (child.userData.type === 'pulse') {
+                        child.userData.originalScale += 0.02;
+                        child.scale.set(
+                            child.userData.originalScale,
+                            child.userData.originalScale,
+                            child.userData.originalScale
+                        );
+                        child.material.opacity = Math.max(0, 0.5 - child.userData.originalScale * 0.1);
+                        if (child.userData.originalScale >= 5) {
+                            child.userData.originalScale = 1;
+                            child.material.opacity = 0.5;
+                        }
+                    }
+                });
+                
+                particles.rotation.y += 0.0005;
+                globeRenderer.render(globeScene, globeCamera);
+            }
+            
+            animate();
+
+            window.addEventListener('resize', () => {
+                const newWidth = container.offsetWidth;
+                const newHeight = container.offsetHeight;
+                globeCamera.aspect = newWidth / newHeight;
+                globeCamera.updateProjectionMatrix();
+                globeRenderer.setSize(newWidth, newHeight);
+            });
+        }
+
+        function rotateGlobe(mode) {
+            isAutoRotating = mode === 'auto';
+        }
+
+        function zoomGlobe(factor) {
+            if (globeCamera) {
+                globeCamera.position.z *= factor;
+                globeCamera.position.z = Math.max(4, Math.min(10, globeCamera.position.z));
+            }
+        }
+
+        function resetGlobe() {
+            if (globeCamera) {
+                globeCamera.position.z = 6;
+            }
+            if (globeMesh) {
+                globeMesh.rotation.set(0, 0, 0);
+            }
+            if (gridHelper) {
+                gridHelper.rotation.set(0, 0, 0);
+            }
+            if (airportGroup) {
+                airportGroup.rotation.set(0, 0, 0);
+            }
+            isAutoRotating = true;
+        }
+
+        function showAirportDetail(airport) {
+            const panel = document.getElementById('airportDetailPanel');
+            if (!panel) return;
+            
+            const levelColors = {
+                1: '#FF9900',
+                2: '#00CCFF',
+                3: '#00FF88'
+            };
+            
+            const levelNames = {
+                1: '一星级',
+                2: '二星级',
+                3: '三星级'
+            };
+            
+            panel.innerHTML = `
+                <div class="panel-header">
+                    <h3>机场详情</h3>
+                    <button class="close-btn" onclick="closeAirportDetail()">×</button>
+                </div>
+                <div class="airport-detail-content" style="text-align: left;">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 16px;">
+                        <div style="width: 40px; height: 40px; background: ${levelColors[airport.level]}20; border: 2px solid ${levelColors[airport.level]}; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px;">✈</div>
+                        <div>
+                            <h4 class="detail-name" style="margin: 0; font-size: 16px;">${airport.name}</h4>
+                            <span class="badge" style="background: ${levelColors[airport.level]}20; color: ${levelColors[airport.level]}; border-color: ${levelColors[airport.level]};">${levelNames[airport.level]}</span>
+                        </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+                            <div style="font-size: 11px; color: #666; margin-bottom: 4px;">碳排放得分</div>
+                            <div style="font-size: 20px; font-weight: 700; color: #00CCFF;">${airport.carbon}</div>
+                            <div class="progress-bar" style="margin-top: 4px;">
+                                <div class="progress" style="width: ${airport.carbon}%"></div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+                            <div style="font-size: 11px; color: #666; margin-bottom: 4px;">能源效率</div>
+                            <div style="font-size: 20px; font-weight: 700; color: #00FF88;">${airport.energy}</div>
+                            <div class="progress-bar" style="margin-top: 4px;">
+                                <div class="progress" style="width: ${airport.energy}%; background: linear-gradient(90deg, #00FF88, #00CCFF);"></div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+                            <div style="font-size: 11px; color: #666; margin-bottom: 4px;">废弃物处理</div>
+                            <div style="font-size: 20px; font-weight: 700; color: #FF9900;">${airport.waste}</div>
+                            <div class="progress-bar" style="margin-top: 4px;">
+                                <div class="progress" style="width: ${airport.waste}%; background: linear-gradient(90deg, #FF9900, #00CCFF);"></div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.3); padding: 12px; border-radius: 8px;">
+                            <div style="font-size: 11px; color: #666; margin-bottom: 4px;">综合评分</div>
+                            <div style="font-size: 20px; font-weight: 700; color: #E0F0FF;">${Math.round((airport.carbon + airport.energy + airport.waste) / 3)}</div>
+                            <div class="progress-bar" style="margin-top: 4px;">
+                                <div class="progress" style="width: ${Math.round((airport.carbon + airport.energy + airport.waste) / 3)}%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn btn-primary btn-sm" onclick="navigate('evaluation')">查看评价报告</button>
+                        <button class="btn btn-secondary btn-sm" onclick="navigate('analysis')">同类对标分析</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function closeAirportDetail() {
+            const panel = document.getElementById('airportDetailPanel');
+            if (!panel) return;
+            
+            panel.innerHTML = `
+                <div class="panel-header">
+                    <h3>机场详情</h3>
+                    <button class="close-btn" onclick="closeAirportDetail()">×</button>
+                </div>
+                <div class="airport-detail-content">
+                    <div class="detail-icon">✈</div>
+                    <h4 class="detail-name">点击地球标记查看详情</h4>
+                    <p class="detail-hint">选择地图上的机场标记，查看该机场的详细数据和评价指标</p>
+                </div>
+            `;
+        }
+
+        function updateChart(type) {
+            console.log('Update chart:', type);
+        }
+    </script>
+</body>
+</html>
