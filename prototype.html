@@ -388,6 +388,26 @@
         .sidebar.collapsed .collapse-btn {
             transform: rotate(180deg);
         }
+        .sidebar-toggle-btn {
+            width: 36px;
+            height: 36px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            margin-right: 12px;
+        }
+        .sidebar-toggle-btn:hover {
+            background: var(--primary-light);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
         .sidebar-menu {
             padding: 16px 0;
         }
@@ -1839,7 +1859,6 @@
                             <p>二期管理后台</p>
                         </div>
                     </div>
-                    <button class="collapse-btn" onclick="toggleSidebar()">›</button>
                 </div>
                 <nav class="sidebar-menu">
                     <div class="menu-group-title">数据模块</div>
@@ -1946,6 +1965,7 @@
             <main class="content-area">
                 <header class="top-nav">
                     <div class="top-nav-left">
+                        <button class="sidebar-toggle-btn" onclick="toggleSidebar()">‹</button>
                         <div class="breadcrumb">
                             <a href="#">首页</a>
                             <span>›</span>
@@ -2075,7 +2095,11 @@
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.sidebar-toggle-btn');
             sidebar.classList.toggle('collapsed');
+            if (toggleBtn) {
+                toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '›' : '‹';
+            }
         }
 
         function navigate(page) {
