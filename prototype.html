@@ -2295,6 +2295,7 @@
                 case 'preScore': return renderPreScore();
                 case 'compliance': return renderCompliance();
                 case 'carbon': return renderCarbon();
+                case 'esg': return renderEsg();
                 case 'personalize': return renderPersonalize();
                 case 'procurement': return renderProcurement();
                 case 'contribution': return renderContribution();
@@ -3133,6 +3134,153 @@
                                 <tbody>
                                     <tr><td>2026-06-20</td><td>买入</td><td>1000</td><td>850</td><td><span class="badge success">已完成</span></td></tr>
                                     <tr><td>2026-06-15</td><td>卖出</td><td>500</td><td>880</td><td><span class="badge success">已完成</span></td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderEsg() {
+            return `
+                <div class="page-title">
+                    <h1>ESG报告管理</h1>
+                    <p>环境、社会、治理报告的编制与管理</p>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ESG报告列表</h3>
+                        <button class="btn btn-primary" onclick="showToast('即将打开新建ESG报告弹窗', 'info')">+ 新建报告</button>
+                    </div>
+                    <table class="data-table">
+                        <thead>
+                            <tr><th>报告名称</th><th>所属机场</th><th>报告周期</th><th>状态</th><th>创建时间</th><th>操作</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2025年度ESG报告</td>
+                                <td>深圳宝安国际机场</td>
+                                <td>2025年</td>
+                                <td><span class="badge success">已发布</span></td>
+                                <td>2026-03-15</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="showToast('查看报告', 'info')">查看</button>
+                                    <button class="btn btn-sm btn-secondary" onclick="showToast('编辑报告', 'info')">编辑</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2025年度ESG报告</td>
+                                <td>上海浦东国际机场</td>
+                                <td>2025年</td>
+                                <td><span class="badge success">已发布</span></td>
+                                <td>2026-03-20</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="showToast('查看报告', 'info')">查看</button>
+                                    <button class="btn btn-sm btn-secondary" onclick="showToast('编辑报告', 'info')">编辑</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2025年度ESG报告</td>
+                                <td>广州白云国际机场</td>
+                                <td>2025年</td>
+                                <td><span class="badge warning">审核中</span></td>
+                                <td>2026-03-25</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="showToast('查看报告', 'info')">查看</button>
+                                    <button class="btn btn-sm btn-secondary" onclick="showToast('编辑报告', 'info')">编辑</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2025年度ESG报告</td>
+                                <td>成都天府国际机场</td>
+                                <td>2025年</td>
+                                <td><span class="badge info">草稿</span></td>
+                                <td>2026-04-01</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="showToast('查看报告', 'info')">查看</button>
+                                    <button class="btn btn-sm btn-secondary" onclick="showToast('编辑报告', 'info')">编辑</button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>2024年度ESG报告</td>
+                                <td>北京首都国际机场</td>
+                                <td>2024年</td>
+                                <td><span class="badge success">已发布</span></td>
+                                <td>2025-03-10</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" onclick="showToast('查看报告', 'info')">查看</button>
+                                    <button class="btn btn-sm btn-secondary" onclick="showToast('编辑报告', 'info')">编辑</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>ESG指标概览</h3>
+                    </div>
+                    <div class="form-grid" style="grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                        <div class="stat-card">
+                            <div class="stat-icon primary">🌱</div>
+                            <div class="stat-content">
+                                <div class="value">85</div>
+                                <div class="label">环境得分(E)</div>
+                                <div class="trend up">↑ 5分 同比增长</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon success">🤝</div>
+                            <div class="stat-content">
+                                <div class="value">78</div>
+                                <div class="label">社会得分(S)</div>
+                                <div class="trend up">↑ 3分 同比增长</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon warning">📋</div>
+                            <div class="stat-content">
+                                <div class="value">92</div>
+                                <div class="label">治理得分(G)</div>
+                                <div class="trend stable">— 持平</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h3>指标达标情况</h3>
+                    </div>
+                    <div class="chart-row">
+                        <div class="chart-card">
+                            <div class="chart-title">环境指标完成率</div>
+                            <div class="mini-chart">
+                                <svg viewBox="0 0 400 200" style="width:100%;height:100%;">
+                                    <rect x="30" y="50" width="80" height="100" fill="rgba(0,204,255,0.2)" stroke="#00CCFF" stroke-width="2" rx="4"/>
+                                    <rect x="30" y="65" width="80" height="85" fill="#00CCFF" rx="4"/>
+                                    <text x="70" y="170" fill="#666" font-size="12" text-anchor="middle">碳排放</text>
+                                    <text x="70" y="45" fill="#00CCFF" font-size="11" text-anchor="middle">85%</text>
+                                    
+                                    <rect x="150" y="50" width="80" height="100" fill="rgba(0,255,136,0.2)" stroke="#00FF88" stroke-width="2" rx="4"/>
+                                    <rect x="150" y="70" width="80" height="80" fill="#00FF88" rx="4"/>
+                                    <text x="190" y="170" fill="#666" font-size="12" text-anchor="middle">能耗强度</text>
+                                    <text x="190" y="45" fill="#00FF88" font-size="11" text-anchor="middle">80%</text>
+                                    
+                                    <rect x="270" y="50" width="80" height="100" fill="rgba(0,204,255,0.2)" stroke="#00CCFF" stroke-width="2" rx="4"/>
+                                    <rect x="270" y="40" width="80" height="110" fill="#00CCFF" rx="4"/>
+                                    <text x="310" y="170" fill="#666" font-size="12" text-anchor="middle">可再生能源</text>
+                                    <text x="310" y="35" fill="#00CCFF" font-size="11" text-anchor="middle">110%</text>
+                                </svg>
+                            </div>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">ESG报告模板库</div>
+                            <table class="data-table" style="font-size: 12px;">
+                                <thead><tr><th>模板名称</th><th>版本</th><th>适用场景</th><th>操作</th></tr></thead>
+                                <tbody>
+                                    <tr><td>通用ESG报告模板</td><td>V2.0</td><td>全场景</td><td><button class="btn btn-sm btn-primary" onclick="showToast('使用模板', 'info')">使用</button></td></tr>
+                                    <tr><td>机场专项ESG模板</td><td>V1.5</td><td>机场行业</td><td><button class="btn btn-sm btn-primary" onclick="showToast('使用模板', 'info')">使用</button></td></tr>
+                                    <tr><td>GRI标准模板</td><td>V1.0</td><td>国际报告</td><td><button class="btn btn-sm btn-primary" onclick="showToast('使用模板', 'info')">使用</button></td></tr>
                                 </tbody>
                             </table>
                         </div>
