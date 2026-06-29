@@ -1218,6 +1218,10 @@
             display: flex;
             flex-direction: column;
             pointer-events: none;
+            transition: all 0.3s ease;
+        }
+        .dashboard-overlay.collapsed {
+            padding-top: 16px;
         }
         .dashboard-overlay > * {
             pointer-events: auto;
@@ -2353,6 +2357,7 @@
                             <div class="header-controls">
                                 <button class="btn btn-secondary btn-sm" onclick="rotateGlobe('auto')">自动旋转</button>
                                 <button class="btn btn-secondary btn-sm" onclick="rotateGlobe('stop')">停止旋转</button>
+                                <button class="btn btn-primary btn-sm" onclick="togglePanels()" id="togglePanelsBtn">收起所有</button>
                             </div>
                         </div>
                         <div class="kpi-row">
@@ -4112,6 +4117,34 @@
 
         function rotateGlobe(mode) {
             isAutoRotating = mode === 'auto';
+        }
+
+        function togglePanels() {
+            const container = document.querySelector('.dashboard-overlay');
+            const kpiRow = document.querySelector('.kpi-row');
+            const dashboardBody = document.querySelector('.dashboard-body');
+            const headerTitle = document.querySelector('.header-title');
+            const btn = document.getElementById('togglePanelsBtn');
+            
+            if (container.classList.contains('collapsed')) {
+                container.classList.remove('collapsed');
+                kpiRow.style.display = 'flex';
+                dashboardBody.style.display = 'flex';
+                headerTitle.style.display = 'block';
+                btn.textContent = '收起所有';
+                if (globeCamera) {
+                    globeCamera.position.set(0, 0, 3);
+                }
+            } else {
+                container.classList.add('collapsed');
+                kpiRow.style.display = 'none';
+                dashboardBody.style.display = 'none';
+                headerTitle.style.display = 'none';
+                btn.textContent = '展开所有';
+                if (globeCamera) {
+                    globeCamera.position.set(0, 0, 2);
+                }
+            }
         }
 
         function zoomGlobe(factor) {
