@@ -157,13 +157,13 @@
         .toast {
             position: fixed;
             top: 20px;
-            right: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100%);
             padding: 12px 24px;
             border-radius: 8px;
             font-size: 14px;
             z-index: 2000;
             opacity: 0;
-            transform: translateX(100%);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
@@ -171,7 +171,7 @@
         }
         .toast.active {
             opacity: 1;
-            transform: translateX(0);
+            transform: translateX(-50%) translateY(0);
         }
         .toast.success {
             background: rgba(0, 255, 136, 0.15);
