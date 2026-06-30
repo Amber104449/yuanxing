@@ -509,6 +509,7 @@
             min-height: 100vh;
             background: var(--bg-page);
             overflow-x: auto;
+            transition: margin-left 0.3s ease;
         }
         .sidebar.collapsed ~ .content-area {
             margin-left: 0;
@@ -2112,6 +2113,15 @@
             if (toggleBtn) {
                 toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '›' : '‹';
             }
+            setTimeout(() => {
+                if (currentPage === 'dashboard' && globeRenderer && globeContainer) {
+                    const width = globeContainer.offsetWidth;
+                    const height = globeContainer.offsetHeight;
+                    globeRenderer.setSize(width, height);
+                    globeCamera.aspect = width / height;
+                    globeCamera.updateProjectionMatrix();
+                }
+            }, 350);
         }
 
         function navigate(page) {
